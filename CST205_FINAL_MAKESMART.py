@@ -95,13 +95,29 @@ def changePitch(sound, delta):
   """ Returns: """
   """       A sound object with a new pitch """  
   #TODO could add some low level validation to ensure delta arg is within range
-  samplingRate = getSamplingRate(sound)
+  samplingRate = samplingRate = getSamplingRate(sound)
   numSamples = getNumSamples(sound)
   newSound = makeEmptySound(numSamples,int(samplingRate*delta)) #by changing the sampling rate the frequency adjusts the pitch
   newSound = copy(newSound,sound,0)
-  return(newSound)  
+  return maxVolume(newSound)
 
+def maxSample(sound):
+  """ sound:(string) the sound file """
+  """ returns the largest sample value in a sound """
+  largest = 0
+  for s in getSamples(sound):
+    largest = max(largest,getSample(s))
+  factor = 32767.0 / largest
+  return largest
 
+def maxVolume(sound):
+  """ sets the maximum posible volume """
+  """ sound:(string) the sound file """
+  factor = 32767.0 / maxSample(sound)
+  for s in getSamples(sound):
+    louder = factor * getSample(s)
+    setSample(s,louder)
+  return sound
 
 
 def getPicture(fileName):
@@ -231,7 +247,10 @@ def chooseCharacterVoice():
 def welcomeMessage():
     #TODO make this function work
     """ Displays a textbox welcome message to the user """
-    showInformation('THIS IS THE WELCOME MESSAGE')
+    showInformation('Welcome to RPG Character Generator!\n'\
+                     'You can choose the character of your choice\n'\
+                     'change the color of the character and the pitch of its voice!')
+                     
     
 def characterGenerator():
     #TODO make this function work
@@ -255,7 +274,9 @@ def characterGenerator():
     if voicePitch == 'HIGH':
       voice = changePitch(voice, 1.15)      
     elif voicePitch == 'LOW':
-      voice = changePitch(voice, .85) 
+      voice = changePitch(voice, .85)
+    else:
+      voice = changePitch(voice, 1)
      
     #TODO Just testing the colorize function, this should be edited later
     #TODO I made the wizard_example_colored in MS paint so the threshold will be way lower when I make the real photos in photoshop
